@@ -4,6 +4,20 @@
 <!--
 	Add placeholder for next release with `wip` snippet
 -->
+## __WORK IN PROGRESS__
+### Features
+* Support remapping notifications (#8667, #8668)
+* Add a new synthetic "Opening state" variable with 3 states to represent door/window state: Closed/Open/Tilt; deprecate all old ones (#8676)
+
+### Bugfixes
+* Respect wait time requirements when polling automatically, e.g. when auto-refreshing values (#8662)
+* Do not skip Alarm Sensor CC interview when Notification CC is only v1 (#8657)
+* Disable optimistic value updates for User Code CC (#8617)
+* Reduced the memory footprint by 3-5 MB by importing TypeScript's helper functions at runtime instead of inlining them in every file (#8673)
+
+### Config file changes
+* Remap notification events to door/handle state variables on Hoppe eHandle (#8670)
+
 ## 15.21.1 (2026-02-27)
 ### Bugfixes
 * Fixed a race condition in the web serial binding that could cause an error when destroying the driver (#8644)
