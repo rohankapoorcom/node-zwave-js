@@ -4,7 +4,7 @@
 <!--
 	Add placeholder for next release with `wip` snippet
 -->
-## __WORK IN PROGRESS__
+## 15.22.0 (2026-03-18)
 ### Features
 * Support remapping notifications (#8667, #8668)
 * Add a new synthetic "Opening state" variable with 3 states to represent door/window state: Closed/Open/Tilt; deprecate all old ones (#8676)
