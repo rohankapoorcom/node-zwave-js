@@ -66,8 +66,8 @@
   "scripts": {
     "ts": "tsx --conditions=@@dev",
     "codegen": "yarn ts maintenance/codegen.ts",
-    "build": "tsc -b tsconfig.build.json --pretty && yarn postbuild",
-    "postbuild": "yarn esm2cjs --in build/esm --out build/cjs -l error -t node18",
+    "build": "tsgo -b tsconfig.build.json --pretty && yarn postbuild",
+    "postbuild": "yarn esm2cjs --in build/esm --out build/cjs -l error -t node20",
     "clean": "del-cli build/ \"*.tsbuildinfo\"",
     "extract-api": "yarn api-extractor run",
     "lint:zwave": "yarn lint:config:custom && yarn lint:config:eslint",
@@ -101,6 +101,7 @@
     "@types/sinon": "^21.0.0",
     "@types/xml2js": "^0.4.14",
     "@types/yargs": "^17.0.34",
+    "@typescript/native-preview": "7.0.0-dev.20260318.1",
     "@zwave-js/maintenance": "workspace:*",
     "comment-json": "^4.3.0",
     "del-cli": "^7.0.0",
@@ -109,7 +110,6 @@
     "ky": "^1.8.1",
     "sinon": "^21.0.1",
     "tsx": "^4.20.5",
-    "typescript": "5.9.3",
     "vitest": "^4.0.18",
     "xml2js": "^0.6.2",
     "yargs": "^18.0.0"
