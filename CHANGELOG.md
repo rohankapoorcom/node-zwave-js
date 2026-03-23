@@ -4,7 +4,7 @@
 <!--
 	Add placeholder for next release with `wip` snippet
 -->
-## __WORK IN PROGRESS__
+## 15.22.1 (2026-03-23)
 ### Bugfixes
 * Fixed an issue where `targetValue` was not updated optimistically on slow devices after the command was accepted (#8711)
 
