@@ -4,6 +4,16 @@
 <!--
 	Add placeholder for next release with `wip` snippet
 -->
+## __WORK IN PROGRESS__
+### Bugfixes
+* Fixed an issue where `targetValue` was not updated optimistically on slow devices after the command was accepted (#8711)
+
+### Config file changes
+* Warnings about problematic firmware versions are now shown based on the SDK version of the device, instead of the manufacturer-defined firmware version (#8709)
+
+### Changes under the hood
+* We now use the upcoming native port of the TypeScript compiler for much faster builds (#7954)
+
 ## 15.22.0 (2026-03-18)
 ### Features
 * Support remapping notifications (#8667, #8668)
