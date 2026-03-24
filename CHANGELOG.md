@@ -4,6 +4,11 @@
 <!--
 	Add placeholder for next release with `wip` snippet
 -->
+## __WORK IN PROGRESS__
+### Bugfixes
+* If the driver was initialized with the option `bootloaderMode: "stay"`, it will now also stay in bootloader mode after a successful firmware update (#8714)
+* Fixed a check during Zniffer initialization that would reject a custom serial port binding (#8712)
+
 ## 15.22.1 (2026-03-23)
 ### Bugfixes
 * Fixed an issue where `targetValue` was not updated optimistically on slow devices after the command was accepted (#8711)
