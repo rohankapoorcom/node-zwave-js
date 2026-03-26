@@ -4,6 +4,10 @@
 <!--
 	Add placeholder for next release with `wip` snippet
 -->
+## __WORK IN PROGRESS__
+### Bugfixes
+* Parse multiline command descriptions from end device CLI correctly (#8719)
+
 ## 15.22.3 (2026-03-26)
 ### Bugfixes
 * Handle commands with args in end device CLI client (#8715)
