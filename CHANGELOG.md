@@ -4,7 +4,7 @@
 <!--
 	Add placeholder for next release with `wip` snippet
 -->
-## __WORK IN PROGRESS__
+## 15.22.4 (2026-03-26)
 ### Bugfixes
 * Parse multiline command descriptions from end device CLI correctly (#8719)
 
