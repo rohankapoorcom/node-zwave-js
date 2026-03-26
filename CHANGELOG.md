@@ -4,7 +4,7 @@
 <!--
 	Add placeholder for next release with `wip` snippet
 -->
-## __WORK IN PROGRESS__
+## 15.22.3 (2026-03-26)
 ### Bugfixes
 * Handle commands with args in end device CLI client (#8715)
 
