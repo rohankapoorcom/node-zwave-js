@@ -4,7 +4,7 @@
 <!--
 	Add placeholder for next release with `wip` snippet
 -->
-## __WORK IN PROGRESS__
+## 15.22.5 (2026-03-30)
 ### Bugfixes
 * Fixed unwanted delays in `Node.pollValue` called by user/application code (#8726)
 
