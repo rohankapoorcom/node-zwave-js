@@ -7,12 +7,10 @@ import {
 	MessagePriority,
 	type MessageRecord,
 	type SupervisionResult,
-	ValueMetadata,
 	type WithAddress,
 	ZWaveError,
 	ZWaveErrorCodes,
 	encodeBitMask,
-	enumValuesToMetadataStates,
 	parseBitMask,
 	validatePayload,
 } from "@zwave-js/core";
@@ -24,16 +22,7 @@ import {
 	uint8ArrayToStringUTF16BE,
 } from "@zwave-js/shared";
 import { validateArgs } from "@zwave-js/transformers";
-import {
-	CCAPI,
-	POLL_VALUE,
-	PhysicalCCAPI,
-	type PollValueImplementation,
-	SET_VALUE,
-	type SetValueImplementation,
-	throwUnsupportedProperty,
-	throwWrongValueType,
-} from "../lib/API.js";
+import { CCAPI, PhysicalCCAPI } from "../lib/API.js";
 import {
 	type CCRaw,
 	CommandClass,
@@ -59,6 +48,7 @@ import {
 	UserCredentialCredentialReportType,
 	type UserCredentialKeyLockerEntryCapability,
 	UserCredentialKeyLockerEntryType,
+	UserCredentialLearnStatus,
 	UserCredentialModifierType,
 	UserCredentialNameEncoding,
 	UserCredentialOperationType,
@@ -75,6 +65,8 @@ function credentialToLogString(credential: string | Bytes): string {
 	return "*".repeat(credential.length);
 }
 
+// All of these values are internal, and not meant to be used by applications directly.
+// To interact with user credentials, use the functionality on the ZWaveNode class.
 export const UserCredentialCCValues = V.defineCCValues(
 	CommandClasses["User Credential"],
 	{
@@ -150,13 +142,8 @@ export const UserCredentialCCValues = V.defineCCValues(
 			(userId: number) => userId,
 			({ property, propertyKey }) =>
 				property === "userType" && typeof propertyKey === "number",
-			(userId: number) => ({
-				...ValueMetadata.ReadOnlyUInt8,
-				label: `User type (${userId})`,
-				states: enumValuesToMetadataStates(
-					UserCredentialUserType,
-				),
-			}),
+			undefined,
+			{ internal: true },
 		),
 		...V.dynamicPropertyAndKeyWithName(
 			"userActive",
@@ -165,10 +152,8 @@ export const UserCredentialCCValues = V.defineCCValues(
 			({ property, propertyKey }) =>
 				property === "userActive"
 				&& typeof propertyKey === "number",
-			(userId: number) => ({
-				...ValueMetadata.Boolean,
-				label: `Active (${userId})`,
-			}),
+			undefined,
+			{ internal: true },
 		),
 		...V.dynamicPropertyAndKeyWithName(
 			"credentialRule",
@@ -177,11 +162,8 @@ export const UserCredentialCCValues = V.defineCCValues(
 			({ property, propertyKey }) =>
 				property === "credentialRule"
 				&& typeof propertyKey === "number",
-			(userId: number) => ({
-				...ValueMetadata.ReadOnlyUInt8,
-				label: `Credential rule (${userId})`,
-				states: enumValuesToMetadataStates(UserCredentialRule),
-			}),
+			undefined,
+			{ internal: true },
 		),
 		...V.dynamicPropertyAndKeyWithName(
 			"expiringTimeoutMinutes",
@@ -190,10 +172,8 @@ export const UserCredentialCCValues = V.defineCCValues(
 			({ property, propertyKey }) =>
 				property === "expiringTimeoutMinutes"
 				&& typeof propertyKey === "number",
-			(userId: number) => ({
-				...ValueMetadata.ReadOnlyUInt16,
-				label: `Expiring timeout minutes (${userId})`,
-			}),
+			undefined,
+			{ internal: true },
 		),
 		...V.dynamicPropertyAndKeyWithName(
 			"userName",
@@ -202,10 +182,8 @@ export const UserCredentialCCValues = V.defineCCValues(
 			({ property, propertyKey }) =>
 				property === "userName"
 				&& typeof propertyKey === "number",
-			(userId: number) => ({
-				...ValueMetadata.ReadOnlyString,
-				label: `User name (${userId})`,
-			}),
+			undefined,
+			{ internal: true },
 		),
 		...V.dynamicPropertyAndKeyWithName(
 			"userModifierType",
@@ -271,26 +249,16 @@ export const UserCredentialCCValues = V.defineCCValues(
 			({ property, propertyKey }) =>
 				property === "credential"
 				&& typeof propertyKey === "number",
-			(userId: number, type: UserCredentialType, slot: number) => ({
-				...ValueMetadata.ReadOnlyBuffer,
-				label: `Credential (user ${userId}, ${
-					getEnumMemberName(
-						UserCredentialType,
-						type,
-					)
-				}, slot ${slot})`,
-			}),
-			{ secret: true },
+			undefined,
+			{ internal: true, secret: true },
 		),
 
 		// Admin PIN Code
 		...V.staticProperty(
 			"adminPinCode",
+			undefined,
 			{
-				...ValueMetadata.String,
-				label: "Admin PIN Code",
-			},
-			{
+				internal: true,
 				secret: true,
 			},
 		),
@@ -568,6 +536,25 @@ export class UserCredentialCCAPI extends PhysicalCCAPI {
 			UserCredentialCommand.CredentialLearnStart,
 		);
 
+		// The node will ignore the command if credential learning is not
+		// supported for this credential type (CC:0083.01.0F.11.004)
+		const caps = UserCredentialCC.getCredentialCapabilitiesCached(
+			this.host,
+			this.endpoint,
+			options.credentialType,
+		);
+		if (caps && !caps.supportsCredentialLearn) {
+			throw new ZWaveError(
+				`Credential learning is not supported for credential type ${
+					getEnumMemberName(
+						UserCredentialType,
+						options.credentialType,
+					)
+				}`,
+				ZWaveErrorCodes.CC_NotSupported,
+			);
+		}
+
 		const cc = new UserCredentialCCCredentialLearnStart({
 			nodeId: this.endpoint.nodeId,
 			endpointIndex: this.endpoint.index,
@@ -675,6 +662,24 @@ export class UserCredentialCCAPI extends PhysicalCCAPI {
 			UserCredentialCommand,
 			UserCredentialCommand.AdminPinCodeSet,
 		);
+
+		// Deactivating the admin code (empty string) requires ACD support,
+		// otherwise the node may ignore the command (CC:0083.01.1A.13.003)
+		if (options.pinCode.length === 0) {
+			const supportsDeactivation = this.tryGetValueDB()?.getValue<
+				boolean
+			>(
+				UserCredentialCCValues.supportsAdminCodeDeactivation.endpoint(
+					this.endpoint.index,
+				),
+			);
+			if (supportsDeactivation === false) {
+				throw new ZWaveError(
+					"This node does not support deactivating the Admin Code",
+					ZWaveErrorCodes.CC_NotSupported,
+				);
+			}
+		}
 
 		const cc = new UserCredentialCCAdminPinCodeSet({
 			nodeId: this.endpoint.nodeId,
@@ -949,39 +954,6 @@ export class UserCredentialCCAPI extends PhysicalCCAPI {
 			...options,
 		});
 		return this.host.sendCommand(cc, this.commandOptions);
-	}
-
-	protected override get [SET_VALUE](): SetValueImplementation {
-		return async function(
-			this: UserCredentialCCAPI,
-			{ property },
-			value,
-		) {
-			if (property === "adminPinCode") {
-				if (typeof value !== "string") {
-					throwWrongValueType(
-						this.ccId,
-						property,
-						"string",
-						typeof value,
-					);
-				}
-				return this.setAdminPinCode({ pinCode: value });
-			}
-			throwUnsupportedProperty(this.ccId, property);
-		};
-	}
-
-	protected override get [POLL_VALUE](): PollValueImplementation {
-		return async function(
-			this: UserCredentialCCAPI,
-			{ property },
-		) {
-			if (property === "adminPinCode") {
-				return this.getAdminPinCode();
-			}
-			throwUnsupportedProperty(this.ccId, property);
-		};
 	}
 }
 
@@ -3007,7 +2979,7 @@ export class UserCredentialCCCredentialLearnCancel extends UserCredentialCC {}
 
 // @publicAPI
 export interface UserCredentialCCCredentialLearnReportOptions {
-	learnStatus: number;
+	learnStatus: UserCredentialLearnStatus;
 	userId: number;
 	credentialType: UserCredentialType;
 	credentialSlot: number;
@@ -3050,7 +3022,7 @@ export class UserCredentialCCCredentialLearnReport extends UserCredentialCC {
 		});
 	}
 
-	public readonly learnStatus: number;
+	public readonly learnStatus: UserCredentialLearnStatus;
 	public readonly userId: number;
 	public readonly credentialType: UserCredentialType;
 	public readonly credentialSlot: number;
@@ -3070,7 +3042,10 @@ export class UserCredentialCCCredentialLearnReport extends UserCredentialCC {
 		return {
 			...super.toLogEntry(ctx),
 			message: {
-				"learn status": this.learnStatus,
+				"learn status": getEnumMemberName(
+					UserCredentialLearnStatus,
+					this.learnStatus,
+				),
 				"user ID": this.userId,
 				"credential type": getEnumMemberName(
 					UserCredentialType,
