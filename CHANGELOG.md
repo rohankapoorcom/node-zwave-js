@@ -4,7 +4,7 @@
 <!--
 	Add placeholder for next release with `wip` snippet
 -->
-## __WORK IN PROGRESS__
+## 15.23.0 (2026-04-10)
 ### Features
 * Implement Thermostat Operating State CC V2 (#8630)
 * Support User Credential CC V1/V2 (#8629)
