@@ -4,6 +4,20 @@
 <!--
 	Add placeholder for next release with `wip` snippet
 -->
+## __WORK IN PROGRESS__
+### Features
+* Implement Thermostat Operating State CC V2 (#8630)
+* Support User Credential CC V1/V2 (#8629)
+* Add unified API to manage users and credentials across User Code CC and User Credential CC (#8738)
+
+### Bugfixes
+* Lower NVM backup chunk size for Z-Wave.me UZB (#8730)
+
+### Config file changes
+* Add Inovelli VZW30-SN config (#8683)
+* Improve Inovelli VZW30-SN, VZW31-SN, and VZW32-SN config files (#8597, #8598, #8626, #8728)
+* Standardize "Control Associated Device" triggers across 7x series Zooz switches (#8642)
+
 ## 15.22.5 (2026-03-30)
 ### Bugfixes
 * Fixed unwanted delays in `Node.pollValue` called by user/application code (#8726)
