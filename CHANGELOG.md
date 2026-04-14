@@ -4,6 +4,18 @@
 <!--
 	Add placeholder for next release with `wip` snippet
 -->
+## __WORK IN PROGRESS__
+The unified API for credential management introduced in `v15.23.0` is now accessible through `endpoint.accessControl` instead of living directly on the endpoint.
+This change paves the way for similar high-level feature APIs to be added in the future without polluting the `Endpoint` class signature.
+
+This is technically a breaking change, but we expect that this API is not being used yet, so we're going to do some emotional versioning for this release and call it a patch.
+
+### Bugfixes
+* Failed locking attempts through the `Door Lock CC` `setValue` API are no longer silently ignored (#8749)
+
+### Config file changes
+* Add HomeSeer PS100 v2 (#8737)
+
 ## 15.23.0 (2026-04-10)
 ### Features
 * Implement Thermostat Operating State CC V2 (#8630)
