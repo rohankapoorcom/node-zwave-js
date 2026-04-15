@@ -4,7 +4,7 @@
 <!--
 	Add placeholder for next release with `wip` snippet
 -->
-## __WORK IN PROGRESS__
+## 15.23.2 (2026-04-15)
 This release iterates on the new `endpoint.accessControl` again, making that property `undefined` when none of the required command classes are supported.
 
 ## 15.23.1 (2026-04-14)
