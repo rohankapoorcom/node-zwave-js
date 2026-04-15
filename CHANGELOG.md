@@ -4,6 +4,9 @@
 <!--
 	Add placeholder for next release with `wip` snippet
 -->
+## __WORK IN PROGRESS__
+This release iterates on the new `endpoint.accessControl` again, making that property `undefined` when none of the required command classes are supported.
+
 ## 15.23.1 (2026-04-14)
 The unified API for credential management introduced in `v15.23.0` is now accessible through `endpoint.accessControl` instead of living directly on the endpoint.
 This change paves the way for similar high-level feature APIs to be added in the future without polluting the `Endpoint` class signature.
