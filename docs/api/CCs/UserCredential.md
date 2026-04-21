@@ -27,22 +27,33 @@ async getKeyLockerCapabilities(): Promise<Map<UserCredentialKeyLockerEntryType, 
 ```ts
 async setUser(
 	options: UserCredentialCCUserSetOptions,
-): Promise<SupervisionResult | undefined>;
+): Promise<UserCredentialCCUserReport | undefined>;
 ```
+
+Applications should not use this method directly. Prefer the
+`endpoint.accessControl` API for managing users.
 
 ### `getUser`
 
 ```ts
-async getUser(userId: number): Promise<Pick<UserCredentialCCUserReport, "nextUserId" | "modifierType" | "modifierNodeId" | "userId" | "userType" | "active" | "credentialRule" | "expiringTimeoutMinutes" | "nameEncoding" | "userName"> | undefined>;
+async getUser(
+	userId: number,
+): Promise<UserCredentialCCUserReport | undefined>;
 ```
+
+Applications should not use this method directly. Prefer the
+`endpoint.accessControl` API for querying users.
 
 ### `setCredential`
 
 ```ts
 async setCredential(
 	options: UserCredentialCCCredentialSetOptions,
-): Promise<SupervisionResult | undefined>;
+): Promise<UserCredentialCCCredentialReport | undefined>;
 ```
+
+Applications should not use this method directly. Prefer the
+`endpoint.accessControl` API for managing credentials.
 
 ### `getCredential`
 
@@ -51,8 +62,11 @@ async getCredential(
 	userId: number,
 	credentialType: UserCredentialType,
 	credentialSlot: number,
-): Promise<Pick<UserCredentialCCCredentialReport, "userId" | "credentialType" | "credentialSlot" | "credentialReadBack" | "credentialLength" | "credentialData" | "modifierType" | "modifierNodeId" | "nextCredentialType" | "nextCredentialSlot"> | undefined>;
+): Promise<UserCredentialCCCredentialReport | undefined>;
 ```
+
+Applications should not use this method directly. Prefer the
+`endpoint.accessControl` API for querying credentials.
 
 ### `startCredentialLearn`
 
@@ -74,9 +88,12 @@ async cancelCredentialLearn(): Promise<
 
 ```ts
 async setUserCredentialAssociation(
-	options: UserCredentialCCUserCredentialAssociationSetOptions,
-): Promise<SupervisionResult | undefined>;
+	options: UserCredentialCCAssociationSetOptions,
+): Promise<UserCredentialCCAssociationReport | undefined>;
 ```
+
+Applications should not use this method directly. Prefer the
+`endpoint.accessControl` API for reassigning credentials between users.
 
 ### `getAllUsersChecksum`
 
@@ -183,7 +200,7 @@ async sendCredentialLearnReport(
 
 ```ts
 async sendUserCredentialAssociationReport(
-	options: UserCredentialCCUserCredentialAssociationReportOptions,
+	options: UserCredentialCCAssociationReportOptions,
 ): Promise<SupervisionResult | undefined>;
 ```
 

@@ -1506,6 +1506,8 @@ export type {
 	UserCredentialCCAdminPinCodeReportOptions,
 	UserCredentialCCAdminPinCodeSetOptions,
 	UserCredentialCCAllUsersChecksumReportOptions,
+	UserCredentialCCAssociationReportOptions,
+	UserCredentialCCAssociationSetOptions,
 	UserCredentialCCCredentialCapabilitiesReportOptions,
 	UserCredentialCCCredentialChecksumGetOptions,
 	UserCredentialCCCredentialChecksumReportOptions,
@@ -1521,8 +1523,6 @@ export type {
 	UserCredentialCCUserCapabilitiesReportOptions,
 	UserCredentialCCUserChecksumGetOptions,
 	UserCredentialCCUserChecksumReportOptions,
-	UserCredentialCCUserCredentialAssociationReportOptions,
-	UserCredentialCCUserCredentialAssociationSetOptions,
 	UserCredentialCCUserGetOptions,
 	UserCredentialCCUserReportOptions,
 	UserCredentialCCUserSetOptions,
@@ -1534,6 +1534,8 @@ import {
 	UserCredentialCCAdminPinCodeSet,
 	UserCredentialCCAllUsersChecksumGet,
 	UserCredentialCCAllUsersChecksumReport,
+	UserCredentialCCAssociationReport,
+	UserCredentialCCAssociationSet,
 	UserCredentialCCCredentialCapabilitiesGet,
 	UserCredentialCCCredentialCapabilitiesReport,
 	UserCredentialCCCredentialChecksumGet,
@@ -1553,8 +1555,6 @@ import {
 	UserCredentialCCUserCapabilitiesReport,
 	UserCredentialCCUserChecksumGet,
 	UserCredentialCCUserChecksumReport,
-	UserCredentialCCUserCredentialAssociationReport,
-	UserCredentialCCUserCredentialAssociationSet,
 	UserCredentialCCUserGet,
 	UserCredentialCCUserReport,
 	UserCredentialCCUserSet,
@@ -1567,6 +1567,8 @@ export {
 	UserCredentialCCAdminPinCodeSet,
 	UserCredentialCCAllUsersChecksumGet,
 	UserCredentialCCAllUsersChecksumReport,
+	UserCredentialCCAssociationReport,
+	UserCredentialCCAssociationSet,
 	UserCredentialCCCredentialCapabilitiesGet,
 	UserCredentialCCCredentialCapabilitiesReport,
 	UserCredentialCCCredentialChecksumGet,
@@ -1586,8 +1588,6 @@ export {
 	UserCredentialCCUserCapabilitiesReport,
 	UserCredentialCCUserChecksumGet,
 	UserCredentialCCUserChecksumReport,
-	UserCredentialCCUserCredentialAssociationReport,
-	UserCredentialCCUserCredentialAssociationSet,
 	UserCredentialCCUserGet,
 	UserCredentialCCUserReport,
 	UserCredentialCCUserSet,
@@ -2329,8 +2329,8 @@ export function registerCCs(): void {
 	void UserCredentialCCCredentialLearnStart;
 	void UserCredentialCCCredentialLearnCancel;
 	void UserCredentialCCCredentialLearnReport;
-	void UserCredentialCCUserCredentialAssociationSet;
-	void UserCredentialCCUserCredentialAssociationReport;
+	void UserCredentialCCAssociationReport;
+	void UserCredentialCCAssociationSet;
 	void UserCredentialCCAllUsersChecksumReport;
 	void UserCredentialCCAllUsersChecksumGet;
 	void UserCredentialCCUserChecksumReport;

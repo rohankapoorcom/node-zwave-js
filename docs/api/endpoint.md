@@ -303,7 +303,7 @@ if (endpoint.accessControl) {
 }
 ```
 
-> [!NOTE] For nodes using the **User Code CC**, only a subset of the functionality is available. Each user supports a single credential in slot 1, user names and credential rules are not supported, and credential learning is unavailable.
+> [!NOTE] For nodes using the **User Code CC**, only a subset of the functionality is available. Each user maps to a single credential of the device's unified credential type, and the unified credential slot matches the user slot. User names and credential rules are not supported, and credential learning is unavailable.
 
 ### Querying capabilities
 
@@ -344,8 +344,15 @@ interface CredentialCapabilities {
 	>;
 	supportsAdminCode: boolean;
 	supportsAdminCodeDeactivation: boolean;
+	/**
+	 * Whether existing credentials can be reassigned between users via
+	 * {@link AccessControlAPI.assignCredential} without re-enrolling them.
+	 */
+	supportsCredentialAssignment: boolean;
 }
 ```
+
+`supportsCredentialAssignment` is `true` if existing credentials can be re-assigned between users via [`assignCredential`](#assigncredential) without re-enrolling them. Only supported on nodes using the **User Credential CC**.
 
 Each entry in `supportedCredentialTypes` maps a `UserCredentialType` to its capabilities:
 
@@ -469,13 +476,12 @@ Deletes all users and their credentials.
 
 ```ts
 getCredential(
-	userId: number,
 	type: UserCredentialType,
 	slot: number,
 ): Promise<CredentialData | undefined>
 ```
 
-Returns the data for a specific credential. Returns `undefined` if the credential does not exist. Throws if the credential slot is out of range.
+Returns the data for a specific credential identified by its type and slot. Returns `undefined` if the credential does not exist. Throws if the credential slot is out of range.
 
 > [!NOTE] This communicates with the node to retrieve fresh information.
 
@@ -483,13 +489,12 @@ Returns the data for a specific credential. Returns `undefined` if the credentia
 
 ```ts
 getCredentialCached(
-	userId: number,
 	type: UserCredentialType,
 	slot: number,
 ): CredentialData | undefined
 ```
 
-Returns the data for a specific credential. Returns `undefined` if the credential does not exist. Throws if the credential slot is out of range.
+Returns the data for a specific credential identified by its type and slot. Returns `undefined` if the credential does not exist. Throws if the credential slot is out of range.
 
 > [!NOTE] This method uses cached information from the most recent interview.
 
@@ -504,23 +509,69 @@ interface CredentialData {
 }
 ```
 
-#### `getCredentials`
+#### `getCredentialsForUser`
 
 ```ts
-getCredentials(userId: number): Promise<CredentialData[]>
+getCredentialsForUser(
+	userId: number,
+	type?: UserCredentialType,
+): Promise<CredentialData[]>
 ```
 
-Returns all credentials for the given user.
+Returns all credentials for the given user, optionally filtered to a specific type.
 
 > [!NOTE] This communicates with the node to retrieve fresh information.
 
-#### `getCredentialsCached`
+#### `getCredentialsForUserCached`
 
 ```ts
-getCredentialsCached(userId: number): CredentialData[]
+getCredentialsForUserCached(
+	userId: number,
+	type?: UserCredentialType,
+): CredentialData[]
 ```
 
-Returns all credentials for the given user.
+Returns all credentials for the given user, optionally filtered to a specific type.
+
+> [!NOTE] This method uses cached information from the most recent interview.
+
+#### `getCredentialsByType`
+
+```ts
+getCredentialsByType(type: UserCredentialType): Promise<CredentialData[]>
+```
+
+Returns all credentials of the given type, regardless of ownership.
+
+> [!NOTE] This communicates with the node to retrieve fresh information.
+
+#### `getCredentialsByTypeCached`
+
+```ts
+getCredentialsByTypeCached(type: UserCredentialType): CredentialData[]
+```
+
+Returns all credentials of the given type, regardless of ownership.
+
+> [!NOTE] This method uses cached information from the most recent interview.
+
+#### `getAllCredentials`
+
+```ts
+getAllCredentials(): Promise<CredentialData[]>
+```
+
+Returns all credentials, regardless of ownership or type.
+
+> [!NOTE] This communicates with the node to retrieve fresh information.
+
+#### `getAllCredentialsCached`
+
+```ts
+getAllCredentialsCached(): CredentialData[]
+```
+
+Returns all credentials, regardless of ownership or type.
 
 > [!NOTE] This method uses cached information from the most recent interview.
 
@@ -550,6 +601,35 @@ deleteCredential(
 Deletes the given credential. Throws if the credential slot is out of range.
 
 > [!NOTE] For nodes using the **User Code CC**, deleting a credential also deletes the associated user, because User Code CC does not distinguish between users and their credentials.
+
+#### `assignCredential`
+
+```ts
+assignCredential(
+	type: UserCredentialType,
+	slot: number,
+	destinationUserId: number,
+): Promise<AssignCredentialStatus>
+```
+
+Re-assigns an existing credential to a different user without re-enrolling it. Useful for credentials that were added locally on the device (e.g. a biometric) and need to be attached to an existing user that already has other credentials.
+
+Only supported on nodes using the **User Credential CC**. Check the `supportsCredentialAssignment` property of [`getCredentialCapabilitiesCached`](#getcredentialcapabilitiescached) before calling. Throws `CC_NotSupported` on nodes that do not support the User Credential CC.
+
+On success, a [`"credential modified"`](#quotcredential-modifiedquot) event is emitted so UIs can stay in sync.
+
+<!-- #import AssignCredentialStatus from "zwave-js" -->
+
+```ts
+enum AssignCredentialStatus {
+	OK = 0,
+	/** Spec statuses 0x01 / 0x02 / 0x03 — credential type / slot invalid or empty */
+	Error_InvalidCredential = 1,
+	/** Spec statuses 0x04 / 0x05 — destination user invalid or nonexistent */
+	Error_InvalidUser = 2,
+	Error_Unknown = 0xff,
+}
+```
 
 ### Credential learning
 
@@ -641,7 +721,7 @@ interface UserDeletedArgs {
 (endpoint: Endpoint, args: CredentialChangedArgs) => void
 ```
 
-A credential was added or modified. The `args` object contains the credential data after the change:
+A credential was added or modified. The `args` object contains the credential data after the change. `"credential modified"` is also emitted when an existing credential is re-assigned to a different user via [`assignCredential`](#assigncredential); in that case `args.data` may be `undefined` because re-assignment does not carry the credential data.
 
 <!-- #import CredentialChangedArgs from "zwave-js" -->
 
