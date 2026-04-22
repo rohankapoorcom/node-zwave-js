@@ -1,6 +1,6 @@
 {
   "name": "@zwave-js/bindings-browser",
-  "version": "15.23.3",
+  "version": "15.23.4",
   "description": "zwave-js: Host bindings for the browser",
   "keywords": [],
   "publishConfig": {
