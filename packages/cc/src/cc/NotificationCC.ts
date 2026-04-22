@@ -772,8 +772,28 @@ export class NotificationCC extends CommandClass {
 			?.compat?.alarmMapping;
 		if (!mappings) return;
 
-		// Find all mappings to a valid notification variable
+		const node = this.getNode(ctx)!;
 		const supportedNotifications = new Map<number, Set<number>>();
+		// Preserve the notification types and events discovered during the interview
+		for (
+			const type of (this.getValue<readonly number[]>(
+				ctx,
+				NotificationCCValues.supportedNotificationTypes,
+			) ?? [])
+		) {
+			supportedNotifications.set(
+				type,
+				new Set(
+					NotificationCC.getSupportedNotificationEvents(
+						ctx,
+						node,
+						type,
+					) ?? [],
+				),
+			);
+		}
+
+		// Find all mappings to a valid notification variable
 		for (const { to } of mappings) {
 			const notification = getNotification(to.notificationType);
 			if (!notification) continue;
