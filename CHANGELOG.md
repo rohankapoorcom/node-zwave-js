@@ -4,7 +4,7 @@
 <!--
 	Add placeholder for next release with `wip` snippet
 -->
-## __WORK IN PROGRESS__
+## 15.23.3 (2026-04-22)
 This release continues to iterate on the new `endpoint.accessControl` API:
 * Credential slots are considered global per device, not user specific.
 * Set-type credential management methods return specific error types that give more information about what failed.
