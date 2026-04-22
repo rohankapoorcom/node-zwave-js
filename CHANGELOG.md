@@ -4,6 +4,9 @@
 <!--
 	Add placeholder for next release with `wip` snippet
 -->
+## __WORK IN PROGRESS__
+Changed the names of result-type enums on the `endpoint.accessControl` API from `...Status` to `...Result`
+
 ## 15.23.3 (2026-04-22)
 This release continues to iterate on the new `endpoint.accessControl` API:
 * Credential slots are considered global per device, not user specific.
