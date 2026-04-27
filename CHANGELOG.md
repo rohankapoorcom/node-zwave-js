@@ -4,6 +4,13 @@
 <!--
 	Add placeholder for next release with `wip` snippet
 -->
+## __WORK IN PROGRESS__
+### Bugfixes
+* Fixed an issue where the response after setting a duplicate PIN would not be properly matched to the controlling command, causing a timeout (#8761)
+
+### Config file changes
+* Update parameters for Zooz ZSE44 firmware 2.40 (#8759)
+
 ## 15.23.4 (2026-04-22)
 Changed the names of result-type enums on the `endpoint.accessControl` API from `...Status` to `...Result`
 
